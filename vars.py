@@ -1,7 +1,8 @@
 import os
+default_value = 'not_set'
 
-EMAIL        = os.environ['LARZSERVER_EMAIL']
-SECRET       = os.environ['LARZSERVER_FIREBASE_SECRET']
-FB_URL       = os.environ['LARZSERVER_FIREBASE_URL']
-API_BASE_URL = os.environ['LARZSERVER_API_URL']
-API_TOKEN    = os.environ['LARZSERVER_API_TOKEN']
+EMAIL        = os.getenv('LARZSERVER_EMAIL', default_value)
+SECRET       = os.getenv('LARZSERVER_FIREBASE_SECRET', default_value)
+FB_URL       = os.getenv('LARZSERVER_FIREBASE_URL', 'http://{}'.format(default_value))
+API_BASE_URL = os.getenv('LARZSERVER_API_URL', 'http://{}'.format(default_value))
+API_TOKEN    = os.getenv('LARZSERVER_API_TOKEN', default_value)
