@@ -50,8 +50,31 @@ def pull_matches(list_of_userid):
 
 
 @then('it should return the matches')
-def no_duplicate_matches(list_of_userid):
-    pass
+def return_matches(list_of_userid):
+    match_ids_slug = "136020720+136021420+136023435+136026090+136028023+136095625+136097421+136198877+136199362+136199918+136200860"
+
+    httpretty.enable()
+    add_fixtures(list_of_userid, helpers.match_history_uri)
+    add_fixtures([match_ids_slug], helpers.multi_match_uri) 
+
+    instance = Poll()
+    result = instance.matches(list_of_userid)
+    expected = [
+        { 'match_id':'136020720', 'team1': [{'nickname': u'DB_Killer'}, {'nickname': u'Thumping'}, {'nickname': u'One_of_Few'}, {'nickname': u'm0zak'}, {'nickname': u'Counsellor'}], 'team1': [{'nickname': u'deimi'}, {'nickname': u'Schln'}, {'nickname': u'skepparn_'}, {'nickname': u'dolanduck101'}, {'nickname': u'__I1I__'}] }
+#        { 'match_id':'136021420' },
+#        { 'match_id':'136023435' },
+#        { 'match_id':'136026090' },
+#        { 'match_id':'136028023' },
+#        { 'match_id':'136095625' },
+#        { 'match_id':'136097421' },
+#        { 'match_id':'136198877' },
+#        { 'match_id':'136199362' },
+#        { 'match_id':'136199918' },
+#        { 'match_id':'136200860' }
+    ]
+
+    assert result[0]['match_id'] == expected[0]['match_id']
+    teardown()
 
 
 # --- helpers ---
