@@ -49,14 +49,21 @@ class Poll:
 
 
     def to_match_model(self, match_id, list_of_match):
-        return {
+        match = {
             'match_id': match_id,
             'team1': map(self.to_player, [p for p in list_of_match if p['team'] == '1']),
             'team2': map(self.to_player, [p for p in list_of_match if p['team'] == '2'])
         }
 
+        for p in list_of_match:
+            if p['wins'] == '1':
+                match['winning_team'] = p['team']
+                break
+
+        return match
+
 
     def to_player(self, data):
-        return {
-            'nickname': data['nickname']
-        }
+        keys = ['deaths', 'herokills', 'level', 'hero_id', 'nickname', 'heroassists']
+        return { k: data[k] for k in keys }
+
