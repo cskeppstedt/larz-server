@@ -6,3 +6,7 @@ Scenario: Polling matches
     Then it should pull matches for each userid
     And it should pull stats for the 10 latest, unique matches
     And it should return the matches
+
+Scenario: Polling fails
+    Given an invalid userid
+    Then it should return an empty array

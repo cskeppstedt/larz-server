@@ -9,7 +9,7 @@ class Push:
     # =====================================================
     #  Public API
     # =====================================================
-    def push_matches(self, list_of_match):
+    def matches(self, list_of_match):
         for m in list_of_match:
             self.push_match(m) 
 
@@ -19,4 +19,8 @@ class Push:
     # =====================================================
     def push_match(self, match):
         url = "/matches/{}".format(match['match_id'])
-        self.endpoint.post(url, match)
+        print " - pushing match to " + url
+        try:
+            self.endpoint.post(url, match)
+        except BaseException as err:
+            print err

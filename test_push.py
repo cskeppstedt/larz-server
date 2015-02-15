@@ -6,7 +6,7 @@ import json
 
 
 @scenario('push.feature', 'Pushing matches')
-def test_polling_matches():
+def test_pushing_matches():
     pass
 
 
@@ -20,7 +20,7 @@ def list_of_match():
 def push_foreach_match(list_of_match):
     endpoint = Mock()
     instance = Push(endpoint)
-    instance.push_matches(list_of_match)
+    instance.matches(list_of_match)
 
     for m in list_of_match:
         endpoint.post.assert_any_call('/matches/'+m['match_id'], m)
