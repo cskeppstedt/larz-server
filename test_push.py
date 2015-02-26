@@ -23,4 +23,4 @@ def push_foreach_match(list_of_match):
     instance.matches(list_of_match)
 
     for m in list_of_match:
-        endpoint.post.assert_any_call('/matches/'+m['match_id'], m)
+        endpoint.put.assert_any_call('/matches/', m['match_id'], m)

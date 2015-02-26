@@ -18,9 +18,11 @@ class Push:
     #  Private API
     # =====================================================
     def push_match(self, match):
-        url = "/matches/{}".format(match['match_id'])
-        print " - pushing match to " + url
+        m_id = match['match_id']
+        url  = "/matches/"
+        print " - pushing match {} to {}".format(m_id, url)
+        
         try:
-            self.endpoint.post(url, match)
+            self.endpoint.put(url, m_id, match)
         except BaseException as err:
             print err
