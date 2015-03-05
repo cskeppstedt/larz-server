@@ -9,7 +9,7 @@ import helpers
 
 
 @scenario('poll.feature', 'Polling matches')
-def polling_matches():
+def test_polling_matches():
     pass
 
 
