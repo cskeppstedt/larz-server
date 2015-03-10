@@ -4,3 +4,7 @@ Feature: Push
 Scenario: Pushing matches
     Given a list of matches
     Then it should push all matches to firebase
+
+Scenario: Pushing posts
+    Given a post
+    Then it should push the post to Firebase

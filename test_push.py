@@ -24,3 +24,30 @@ def push_foreach_match(list_of_match):
 
     for m in list_of_match:
         endpoint.put.assert_any_call('/matches/', m['match_id'], m)
+
+
+# -----
+
+
+@scenario('push.feature', 'Pushing posts')
+def test_pushing_posts():
+    pass
+
+
+@given('a post')
+def a_post():
+    return {
+        'post_id': 'foo1',
+        'published': '2015-03-10',
+        'embed_url': 'http://blabla.com/video.foo1'
+    }
+
+
+@then('it should push the post to Firebase')
+def push_post(a_post):
+    endpoint = Mock()
+    instance = Push(endpoint)
+    instance.post(a_post)
+
+    endpoint.put.assert_any_call('/posts/', a_post['post_id'], a_post)
+

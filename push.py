@@ -14,6 +14,10 @@ class Push:
             self.push_match(m) 
 
 
+    def post(self, post):
+        self.push_post(post)
+
+
     # =====================================================
     #  Private API
     # =====================================================
@@ -26,3 +30,17 @@ class Push:
             self.endpoint.put(url, m_id, match)
         except BaseException as err:
             print err
+
+
+    def push_post(self, post):
+        p_id = post['post_id']
+        url  = "/posts/"
+        print " - pushing post {} to {}".format(p_id, url)
+        
+        try:
+            self.endpoint.put(url, p_id, post)
+        except BaseException as err:
+            print err
+
+
+
