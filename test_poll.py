@@ -34,7 +34,7 @@ def pull_foreach_userid(list_of_userid):
 
 @then('it should pull stats for the 10 latest, unique matches')
 def pull_matches(list_of_userid):
-    match_ids_slug = "136020720+136021420+136023435+136026090+136028023+136095625+136097421+136198877+136199362+136199918+136200860"
+    match_ids_slug = "136200860+136199918+136199362+136198877+136097421+136095625+136028023+136026090+136020720+136023435"
     req_urls = []
     expected_url = helpers.multi_match_uri(match_ids_slug)
 
@@ -51,29 +51,16 @@ def pull_matches(list_of_userid):
 
 @then('it should return the matches')
 def return_matches(list_of_userid):
-    match_ids_slug = "136020720+136021420+136023435+136026090+136028023+136095625+136097421+136198877+136199362+136199918+136200860"
+    match_ids_slug = "136200860+136199918+136199362+136198877+136097421+136095625+136028023+136026090+136020720+136023435"
 
     httpretty.enable()
     add_fixtures(list_of_userid, helpers.match_history_uri)
     add_fixtures([match_ids_slug], helpers.multi_match_uri) 
 
     result = Poll().matches(list_of_userid)
-    expected = json.loads(helpers.read_file('./fixtures/poll_list-of-match.json'))
-    assert result == expected
-
+    first  = result[0]
+    assert first['date'] == '2015-02-01'
     teardown()
-
-# ---
-
-
-@scenario('poll.feature', 'Polling fails')
-def polling_fails():
-    pass
-
-@given('an invalid userid')
-def invalid_userid():
-    return '-33'
-
 
 
 
