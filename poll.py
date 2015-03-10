@@ -2,6 +2,7 @@ import requests
 import vars
 import helpers
 import re
+import sys
 from itertools import groupby
 
 
@@ -11,13 +12,13 @@ class Poll:
     # =====================================================
     def matches(self, list_of_userid):
         print " - fetching match ids"
-        ids  = self.fetch_match_ids(list_of_userid)
+        matches = self.fetch_matches(list_of_userid)
 
-        print " - fetching data for {} unique match ids".format(len(ids))
-        data = self.fetch_match_data(ids)
+        print " - fetching data for {} unique match ids".format(len(matches))
+        data = self.fetch_match_data(matches)
         
         print " - converting {} objects to match_models".format(len(data))
-        models = self.to_match_models(data)
+        models = self.to_match_models(matches, data)
 
         return list(models)
 
@@ -25,41 +26,51 @@ class Poll:
     # =====================================================
     #  Private API
     # =====================================================
-    def fetch_match_ids(self, list_of_userid):
-        id_set = set([])
-        id_list = []
-        expr = re.compile("([0-9]+)\|[^,]*")
+    def fetch_matches(self, list_of_userid):
+        matches = {}
+        expr = re.compile("([0-9]+)\|(?:[^\|]+)\|(\d{2})\/(\d{2})\/(\d{4}),?")
 
         for userid in list_of_userid:
             url = helpers.match_history_uri(userid)
             print " - fetching match_history for " + userid
             response = requests.get(url).json()
-            for match_id in expr.findall(response[0]["history"]):
-                if match_id not in id_set:
-                    id_list.append(match_id)
+            for m in expr.finditer(response[0]["history"]):
+                (match_id, mm, dd, yyyy) = m.groups()
+                matches[match_id] = '%s-%s-%s' % (yyyy,mm,dd)
             
-        return id_list[-10:]
+        unique_list = [(m, d) for m, d in matches.iteritems()]
+        sorted_list = sorted(unique_list, key = lambda (m, d): (d, m), reverse=True)
+        
+        return sorted_list[:10]
 
 
-    def fetch_match_data(self, list_of_matchid):
-        match_ids_slug = "+".join(list_of_matchid)
+    def fetch_match_data(self, list_of_match):
+        match_ids_slug = "+".join([x[0] for x in list_of_match])
 
         url = helpers.multi_match_uri(match_ids_slug)
         print " - fetching match data from " + url
+        print " - dates: {}".format(", ".join(x[1] for x in list_of_match))
         try:
             return requests.get(url).json()
-        except:
-            return []
+        except IOError as e:
+            print "I/O error({0}): {1}".format(e.errno, e.strerror)
+            raise
+        except Exception:
+            print "Unexpected error:", sys.exc_info()[0]
+            raise
 
 
-    def to_match_models(self, list_of_match):
-        for match_id, data in groupby(list_of_match, lambda m: m['match_id']):
-            yield self.to_match_model(match_id, list(data))
+    def to_match_models(self, list_of_match, list_of_data):
+        lookup = dict(list_of_match)
+        for match_id, data in groupby(list_of_data, lambda m: m['match_id']):
+            date = lookup[match_id]
+            yield self.to_match_model(match_id, date, list(data))
 
 
-    def to_match_model(self, match_id, list_of_match):
+    def to_match_model(self, match_id, date, list_of_match):
         match = {
             'match_id': match_id,
+            'date': date,
             'team1': map(self.to_player, [p for p in list_of_match if p['team'] == '1']),
             'team2': map(self.to_player, [p for p in list_of_match if p['team'] == '2'])
         }
