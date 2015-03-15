@@ -22,7 +22,6 @@ class Poll:
     #  Public API
     # =====================================================
     def match_tokens(self, list_of_userid):
-        log("fetching match ids")
         return self.fetch_matches(list_of_userid)
 
 
