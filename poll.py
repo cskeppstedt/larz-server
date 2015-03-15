@@ -6,20 +6,36 @@ import sys
 from itertools import groupby
 
 
+def log(message):
+    print "  [ poll ]  ", message
+    
+
+def log_url(url, failed=False):
+    if failed == True:
+        log("  (ERR)  " + url)
+    else:
+        log("  (OK ) " + url)
+
+
 class Poll:
     # =====================================================
     #  Public API
     # =====================================================
-    def matches(self, list_of_userid):
-        print " - fetching match ids"
-        matches = self.fetch_matches(list_of_userid)
+    def match_tokens(self, list_of_userid):
+        log("fetching match ids")
+        return self.fetch_matches(list_of_userid)
 
-        print " - fetching data for {} unique match ids".format(len(matches))
-        data = self.fetch_match_data(matches)
+
+    def matches(self, list_of_token):
+        log("fetching data for %d match ids" % len(list_of_token))
+        data = self.fetch_match_data(list_of_token)
+
+        if data == None:
+            return []
+
+        log("converting %d objects to match_models" % len(data))
+        models = self.to_match_models(list_of_token, data)
         
-        print " - converting {} objects to match_models".format(len(data))
-        models = self.to_match_models(matches, data)
-
         return list(models)
 
 
@@ -32,12 +48,27 @@ class Poll:
 
         for userid in list_of_userid:
             url = helpers.match_history_uri(userid)
-            print " - fetching match_history for " + userid
-            response = requests.get(url).json()
-            for m in expr.finditer(response[0]["history"]):
-                (match_id, mm, dd, yyyy) = m.groups()
-                matches[match_id] = '%s-%s-%s' % (yyyy,mm,dd)
-            
+            log("fetching match_history for " + userid)
+            try:
+                response = requests.get(url)
+                try:
+                    json = response.json()
+                    log_url(url)
+                    for m in expr.finditer(json[0]["history"]):
+                        (match_id, mm, dd, yyyy) = m.groups()
+                        matches[match_id] = '%s-%s-%s' % (yyyy,mm,dd)
+                except ValueError:
+                    log_url(url, True)
+                    log('  %s: %s' % (str(response.status_code), response.text))
+            except IOError as e:
+                log_url(url, True)
+                log("I/O error({0}): {1}".format(e.errno, e.strerror))
+                raise
+            except Exception:
+                log_url(url, True)
+                log("unexpected error: " + str(sys.exc_info()[0]))
+                raise
+
         unique_list = [(m, d) for m, d in matches.iteritems()]
         sorted_list = sorted(unique_list, key = lambda (m, d): (d, m), reverse=True)
         
@@ -48,16 +79,27 @@ class Poll:
         match_ids_slug = "+".join([x[0] for x in list_of_match])
 
         url = helpers.multi_match_uri(match_ids_slug)
-        print " - fetching match data from " + url
-        print " - dates: {}".format(", ".join(x[1] for x in list_of_match))
+        log("fetching match data from " + url)
+        log("dates: %s" % ", ".join(x[1] for x in list_of_match))
         try:
-            return requests.get(url).json()
+            response = requests.get(url)
+
+            try:
+                data = response.json()
+                log_url(url)
+                return data
+            except ValueError:
+                log_url(url, True)
+                log('  %s: %s' % (str(response.status_code), response.text))
+                return None
         except IOError as e:
-            print "I/O error({0}): {1}".format(e.errno, e.strerror)
-            raise
+            log_url(url)
+            log("I/O error({0}): {1}".format(e.errno, e.strerror))
+            return None
         except Exception:
-            print "Unexpected error:", sys.exc_info()[0]
-            raise
+            log_url(url, True)
+            log("unexpected error: " + str(sys.exc_info()[0]))
+            return None
 
 
     def to_match_models(self, list_of_match, list_of_data):

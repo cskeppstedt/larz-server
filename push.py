@@ -1,3 +1,7 @@
+def log(message):
+    print "  [ push ]  ", message
+
+
 class Push:
     # =====================================================
     #  Constructor
@@ -24,7 +28,7 @@ class Push:
     def push_match(self, match):
         m_id = match['match_id']
         url  = "/matches/"
-        print " - pushing match {} to {}".format(m_id, url)
+        log("pushing %s%s" % (m_id, url))
         
         try:
             self.endpoint.put(url, m_id, match)
@@ -35,12 +39,10 @@ class Push:
     def push_post(self, post):
         p_id = post['post_id']
         url  = "/posts/"
-        print " - pushing post {} to {}".format(p_id, url)
+        log("pushing %s%s" % (p_id, url))
         
         try:
             self.endpoint.put(url, p_id, post)
         except BaseException as err:
             print err
-
-
 

@@ -5,17 +5,45 @@ from push import Push
 import vars
 
 
-def main():
-    print "Polling matches for {} users".format(len(vars.USERS))
-    matches = Poll().matches(vars.USERS)
-    print "Recieved data for {} matches".format(len(matches))
+def log(message):
+    print "  [ main ]  ", message
 
+
+def main():
+    log('fetching stats for %d users' % len(vars.USERS))
+
+    tokens  = Poll().match_tokens(vars.USERS)
+    if len(tokens) == 0:
+        log('no tokens, exiting')
+        return
+
+    matches = Poll().matches(tokens)
+    if len(matches) == 0:
+        log('no matches, exiting')
+        return
+
+    log("recieved %d match tokens" % len(matches))
+    
     auth     = firebase.FirebaseAuthentication(vars.SECRET, vars.EMAIL)
     endpoint = firebase.FirebaseApplication(vars.FB_URL)
     endpoint.authentication = auth
 
     Push(endpoint).matches(matches)
-    print "Pushed {} matches to firebase".format(len(matches))
+    log("pushed %d matches to firebase" % len(matches))
+
+
+def publish():
+    auth     = firebase.FirebaseAuthentication(vars.SECRET, vars.EMAIL)
+    endpoint = firebase.FirebaseApplication(vars.FB_URL)
+    endpoint.authentication = auth
+
+    post = {
+        'embed_url': 'https://www.youtube.com/embed/UVsIGAEnK_4',
+        'post_id': '2',
+        'published': '2015-03-14 19:10'
+    }
+
+    Push(endpoint).post(post)
 
 
 if __name__ == "__main__":

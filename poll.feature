@@ -1,12 +1,12 @@
 Feature: Poll
     A way to poll statistics from the HoN API
 
-Scenario: Polling matches
+Scenario: Polling match tokens
     Given a list of userid
     Then it should pull matches for each userid
-    And it should pull stats for the 10 latest, unique matches
-    And it should return the matches
+    And it should return the match tokens
 
-Scenario: Polling fails
-    Given an invalid userid
-    Then it should return an empty array
+Scenario: Polling matches
+    Given a list of match tokens
+    Then it should pull the matches
+    And it should return the match data
