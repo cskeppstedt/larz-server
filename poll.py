@@ -4,6 +4,7 @@ import helpers
 import re
 import sys
 from itertools import groupby
+from transform import to_player
 
 
 def log(message):
@@ -112,8 +113,8 @@ class Poll:
         match = {
             'match_id': match_id,
             'date': date,
-            'team1': map(self.to_player, [p for p in list_of_match if p['team'] == '1']),
-            'team2': map(self.to_player, [p for p in list_of_match if p['team'] == '2'])
+            'team1': map(to_player, [p for p in list_of_match if p['team'] == '1']),
+            'team2': map(to_player, [p for p in list_of_match if p['team'] == '2'])
         }
 
         for p in list_of_match:
@@ -122,9 +123,3 @@ class Poll:
                 break
 
         return match
-
-
-    def to_player(self, data):
-        keys = ['deaths', 'herokills', 'level', 'hero_id', 'nickname', 'heroassists']
-        return { k: data[k] for k in keys }
-
