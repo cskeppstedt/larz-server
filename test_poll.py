@@ -102,17 +102,16 @@ def return_matches(list_of_token):
     teardown()
 
 
-
 # --- helpers ---
 
 def add_fixtures(list_of_id, uri_fn, response_cb=None):
     expected_urls = map(uri_fn, list_of_id)
-    
+
     def cb(req, uri, headers):
         if response_cb != None: response_cb(req, uri, headers)
         body = helpers.fixture_for(uri)
         return (200, headers, body)
-    
+
     httpretty.register_uri(httpretty.GET,
                            re.compile("(.*)"),
                            body=cb,
