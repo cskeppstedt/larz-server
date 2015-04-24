@@ -32,7 +32,21 @@ def matches():
     log('matches', "pushed %d matches to firebase" % len(matches))
 
 def players():
-    log('players', 'wassup')
+    log('players', "fetching player_stats for %d users" % len(vars.USERS))
+
+    stats = Poll().player_stats(vars.USERS)
+    if len(stats) == 0:
+        log('players', 'no stats, exiting')
+        return
+
+    log('players', "recieved %d stats entries" % len(stats))
+    
+    auth     = firebase.FirebaseAuthentication(vars.SECRET, vars.EMAIL)
+    endpoint = firebase.FirebaseApplication(vars.FB_URL)
+    endpoint.authentication = auth
+
+    Push(endpoint).player_stats(stats)
+    log('players', "pushed %d stats entries to firebase" % len(stats))
 
 
 def publish():
