@@ -10,3 +10,8 @@ Scenario: Polling matches
     Given a list of match tokens
     Then it should pull the matches
     And it should return the match data
+
+Scenario: Polling player stats
+    Given a list of userid
+    Then it should pull player stats for each userid
+    And it should return the player stats

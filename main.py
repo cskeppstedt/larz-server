@@ -5,31 +5,34 @@ from push import Push
 import vars
 
 
-def log(message):
-    print "  [ main ]  ", message
+def log(funcName, message):
+    print "  [ %s ]  %s" % (funcName, message)
 
 
-def main():
-    log('fetching stats for %d users' % len(vars.USERS))
+def matches():
+    log('matches', 'fetching stats for %d users' % len(vars.USERS))
 
     tokens  = Poll().match_tokens(vars.USERS)
     if len(tokens) == 0:
-        log('no tokens, exiting')
+        log('matches', 'no tokens, exiting')
         return
 
     matches = Poll().matches(tokens)
     if len(matches) == 0:
-        log('no matches, exiting')
+        log('matches', 'no matches, exiting')
         return
 
-    log("recieved %d match tokens" % len(matches))
+    log('matches', "recieved %d match tokens" % len(matches))
     
     auth     = firebase.FirebaseAuthentication(vars.SECRET, vars.EMAIL)
     endpoint = firebase.FirebaseApplication(vars.FB_URL)
     endpoint.authentication = auth
 
     Push(endpoint).matches(matches)
-    log("pushed %d matches to firebase" % len(matches))
+    log('matches', "pushed %d matches to firebase" % len(matches))
+
+def players():
+    log('players', 'wassup')
 
 
 def publish():
@@ -46,5 +49,23 @@ def publish():
     Push(endpoint).post(post)
 
 
+def main(argv):
+    if len(sys.argv) < 2:
+        sys.stderr.write("Usage: %s <matches|players>" % (argv[0],))
+        return 1
+
+    arg = argv[1].strip().lower()
+
+    if arg == 'players':
+        players()
+        return 0
+    elif arg == 'matches':
+        matches()
+        return 0
+    else:
+        sys.stderr.write("Invalid argument %s; valid arguments: matches, players" % (arg,))
+        return 2
+
+
 if __name__ == "__main__":
-    main()
+    sys.exit(main(sys.argv))
