@@ -146,6 +146,8 @@ def return_player_stats(list_of_userid):
         'concedevotes': '174',
         'buybacks': '66',
         'wards': '8138',
+        'consumables': '11549',
+        'actions': '9068281',
         'bloodlust': '158',
         'doublekill': '523',
         'triplekill': '45',
@@ -161,7 +163,18 @@ def return_player_stats(list_of_userid):
         'ks10': '9',
         'ks15': '0',
         'seconds_played': '4045284',
-        'disconnects': '6'
+        'seconds_dead': '439133',
+        'seconds_earning_exp': '4040452',
+        'disconnects': '6',
+        'kicked': '0',
+        'level': '39',
+        'deaths': '10986',
+        'herokills': '6935',
+        'heroassists': '18994',
+        'smackdown': '0',
+        'humiliation': '10',
+        'nemesis': '5552',
+        'retribution': '171',
     }
 
     assert result[1]['date'] == today

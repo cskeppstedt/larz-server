@@ -82,6 +82,12 @@ def to_player_stats(data):
     def wards():
         return data['rnk_wards']
     
+    def consumables():
+        return data['rnk_consumables']
+    
+    def actions():
+        return data['rnk_actions']
+    
     def bloodlust():
         return data['rnk_bloodlust']
     
@@ -124,8 +130,42 @@ def to_player_stats(data):
     def ks15():
         return data['rnk_ks15']
 
+    def seconds_dead():
+        return data['rnk_secs_dead']
+    
     def seconds_played():
         return data['rnk_secs']
+    
+    def seconds_earning_exp():
+        return data['rnk_time_earning_exp']
+    
+    def kicked():
+        return data['rnk_kicked']
+    
+    def level():
+        return data['rnk_level']
+    
+    def deaths():
+        return data['rnk_deaths']
+    
+    def herokills():
+        return data['rnk_herokills']
+    
+    def heroassists():
+        return data['rnk_heroassists']
+    
+    def smackdown():
+        return data['rnk_smackdown']
+    
+    def humiliation():
+        return data['rnk_humiliation']
+    
+    def nemesis():
+        return data['rnk_nemesis']
+    
+    def retribution():
+        return data['rnk_retribution']
+    
 
     return { 
         'date': time.strftime("%Y-%m-%d"),
@@ -139,6 +179,8 @@ def to_player_stats(data):
             'concedevotes': concedevotes(),
             'buybacks': buybacks(),
             'wards': wards(),
+            'consumables': consumables(),
+            'actions': actions(),
             'bloodlust': bloodlust(),
             'doublekill': doublekill(),
             'triplekill': triplekill(),
@@ -154,7 +196,18 @@ def to_player_stats(data):
             'ks10': ks10(),
             'ks15': ks15(),
             'seconds_played': seconds_played(),
+            'seconds_dead': seconds_dead(),
+            'seconds_earning_exp': seconds_earning_exp(),
             'disconnects': disconnects(),
+            'kicked': kicked(),
+            'level': level(),
+            'deaths': deaths(),
+            'herokills': herokills(),
+            'heroassists': heroassists(),
+            'smackdown': smackdown(),
+            'humiliation': humiliation(),
+            'nemesis': nemesis(),
+            'retribution': retribution(),
         }
     }
 
