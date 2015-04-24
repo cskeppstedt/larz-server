@@ -22,13 +22,18 @@ class Push:
         self.push_post(post)
 
 
+    def player_stats(self, stats):
+        for s in stats:
+            self.push_player_stats(s)
+
+
     # =====================================================
     #  Private API
     # =====================================================
     def push_match(self, match):
         m_id = match['match_id']
         url  = "/matches/"
-        log("pushing %s%s" % (m_id, url))
+        log("pushing %s%s" % (url, m_id))
         
         try:
             self.endpoint.put(url, m_id, match)
@@ -43,6 +48,19 @@ class Push:
         
         try:
             self.endpoint.put(url, p_id, post)
+        except BaseException as err:
+            print err
+
+
+    def push_player_stats(self, entry):
+        content_hash = hash(frozenset(entry['data'].items()))
+        key = "%s_%s" % (entry['date'], content_hash)
+        url  = "/stats/"
+
+        log("pushing %s%s" % (url, key))
+        
+        try:
+            self.endpoint.put(url, key, entry)
         except BaseException as err:
             print err
 

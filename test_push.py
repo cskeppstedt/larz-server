@@ -51,3 +51,38 @@ def push_post(a_post):
 
     endpoint.put.assert_any_call('/posts/', a_post['post_id'], a_post)
 
+
+# -----
+
+
+@scenario('push.feature', 'Pushing player stats')
+def test_pushing_player_stats():
+    pass
+
+
+@given('a list of player stats')
+def player_stats():
+    return [
+        {
+            'date': '2015-04-27',
+            'data': { 'nickname': '1', 'mmr': '1499' }
+        },
+        {
+            'date': '2015-04-27',
+            'data': { 'nickname': '2', 'mmr': '1733' }
+        }
+    ]
+
+
+@then('it should push all stats to Firebase')
+def push_player_stats(player_stats):
+    endpoint = Mock()
+    instance = Push(endpoint)
+    instance.player_stats(player_stats)
+        
+    for entry in player_stats:
+        content_hash = hash(frozenset(entry['data'].items()))
+        key = "%s_%s" % (entry['date'], content_hash)
+
+        endpoint.put.assert_any_call('/stats/', key, entry)
+

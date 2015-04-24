@@ -8,3 +8,7 @@ Scenario: Pushing matches
 Scenario: Pushing posts
     Given a post
     Then it should push the post to Firebase
+
+Scenario: Pushing player stats
+    Given a list of player stats
+    Then it should push all stats to Firebase
