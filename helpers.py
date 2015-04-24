@@ -28,3 +28,7 @@ def match_history_uri(userid):
 
 def multi_match_uri(match_ids_slug):
     return "{}/multi_match/statistics/matchids/{}/?token={}".format(vars.API_BASE_URL, match_ids_slug, vars.API_TOKEN)
+
+
+def player_stats_uri(userid):
+    return "{}/player_statistics/ranked/nickname/{}/?token={}".format(vars.API_BASE_URL, userid, vars.API_TOKEN)

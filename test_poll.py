@@ -6,6 +6,7 @@ import re
 import requests
 import vars
 import helpers
+import time
 
 
 # --- polling match tokens ---
@@ -100,6 +101,87 @@ def return_matches(list_of_token):
     first  = result[0]
     assert first['date'] == '2015-04-15'
     teardown()
+
+
+# --- polling matches ---
+
+@scenario('poll.feature', 'Polling player stats')
+def test_polling_player_stats():
+    pass
+
+
+@then('it should pull player stats for each userid')
+def poll_player_stats(list_of_userid):
+    req_urls = []
+    expected_urls = map(helpers.player_stats_uri, list_of_userid)
+
+    httpretty.enable()
+    add_fixtures(list_of_userid, helpers.player_stats_uri, lambda _, uri, __: req_urls.append(uri))
+
+    result = Poll().player_stats(list_of_userid)
+
+    assert req_urls == expected_urls
+    teardown()
+
+
+@then('it should return the player stats')
+def return_player_stats(list_of_userid):
+    expected_urls = map(helpers.player_stats_uri, list_of_userid)
+
+    httpretty.enable()
+    add_fixtures(list_of_userid, helpers.player_stats_uri)
+
+    result = Poll().player_stats(list_of_userid)
+
+    today = time.strftime("%Y-%m-%d")
+
+    assert result[0]['date'] == today
+    assert result[0]['data'] == {
+        'nickname': 'Schln',
+        'mmr': '1574.691', 
+        'games_played': '1843',
+        'wins': '914',
+        'losses': '929',
+        'concedes': '851',
+        'concedevotes': '174',
+        'buybacks': '66',
+        'wards': '8138',
+        'consumables': '11549',
+        'actions': '9068281',
+        'bloodlust': '158',
+        'doublekill': '523',
+        'triplekill': '45',
+        'quadkill': '3',
+        'annihilation': '0',
+        'ks3': '512',
+        'ks4': '237',
+        'ks5': '135',
+        'ks6': '68',
+        'ks7': '37',
+        'ks8': '21',
+        'ks9': '12',
+        'ks10': '9',
+        'ks15': '0',
+        'seconds_played': '4045284',
+        'seconds_dead': '439133',
+        'seconds_earning_exp': '4040452',
+        'disconnects': '6',
+        'kicked': '0',
+        'level': '39',
+        'deaths': '10986',
+        'herokills': '6935',
+        'heroassists': '18994',
+        'smackdown': '0',
+        'humiliation': '10',
+        'nemesis': '5552',
+        'retribution': '171',
+    }
+
+    assert result[1]['date'] == today
+    assert result[1]['data']['nickname'] == 'skepparn_'
+
+    teardown()
+    pass
 
 
 # --- helpers ---

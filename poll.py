@@ -4,7 +4,7 @@ import helpers
 import re
 import sys
 from itertools import groupby
-from transform import to_player
+from transform import to_player, to_player_stats
 
 
 def log(message):
@@ -37,6 +37,14 @@ class Poll:
         models = self.to_match_models(list_of_token, data)
         
         return list(models)
+
+
+    def player_stats(self, list_of_userid):
+        log("fetching player_stats for %d users" % len(list_of_userid))
+        data = self.fetch_player_stats(list_of_userid)
+        models = self.to_player_stats_models(data)
+
+        return models
 
 
     # =====================================================
@@ -100,6 +108,37 @@ class Poll:
             log_url(url, True)
             log("unexpected error: " + str(sys.exc_info()[0]))
             return None
+
+
+    def fetch_player_stats(self, list_of_userid):
+        stats = []
+
+        for userid in list_of_userid:
+            url = helpers.player_stats_uri(userid)
+            log("fetching player_stats for " + userid)
+            try:
+                response = requests.get(url)
+                try:
+                    json = response.json()
+                    log_url(url)
+                    stats.append(json)
+                except ValueError:
+                    log_url(url, True)
+                    log('  %s: %s' % (str(response.status_code), response.text))
+            except IOError as e:
+                log_url(url, True)
+                log("I/O error({0}): {1}".format(e.errno, e.strerror))
+                raise
+            except Exception:
+                log_url(url, True)
+                log("unexpected error: " + str(sys.exc_info()[0]))
+                raise
+
+        return stats
+
+
+    def to_player_stats_models(self, list_of_stats):
+        return map(to_player_stats, list_of_stats)
 
 
     def to_match_models(self, list_of_match, list_of_data):
