@@ -1,6 +1,6 @@
-from pytest_bdd import scenario, given, when, then
-from push import Push
 from mock import Mock
+from push import Push
+from pytest_bdd import scenario, given, then
 import helpers
 import json
 
@@ -62,16 +62,19 @@ def test_pushing_player_stats():
 
 @given('a list of player stats')
 def player_stats():
-    return [
-        {
-            'date': '2015-04-27',
-            'data': { 'nickname': '1', 'mmr': '1499' }
-        },
-        {
-            'date': '2015-04-27',
-            'data': { 'nickname': '2', 'mmr': '1733' }
+    return {
+        'date': '2015-04-27',
+        'data': {
+            'Schln': {
+                'nickname': '1',
+                'mmr': '1499'
+            },
+            'skepparn_': {
+                'nickname': '2',
+                'mmr': '1733'
+            }
         }
-    ]
+    }
 
 
 @then('it should push all stats to Firebase')
@@ -79,10 +82,6 @@ def push_player_stats(player_stats):
     endpoint = Mock()
     instance = Push(endpoint)
     instance.player_stats(player_stats)
-        
-    for entry in player_stats:
-        content_hash = hash(frozenset(entry['data'].items()))
-        key = "%s_%s" % (entry['date'], content_hash)
+    key = player_stats['date']
 
-        endpoint.put.assert_any_call('/stats/', key, entry)
-
+    endpoint.put.assert_any_call('/stats/', key, player_stats)
