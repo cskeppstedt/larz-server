@@ -1,11 +1,8 @@
-from pytest_bdd import scenario, given, when, then
 from poll import Poll
-import json
+from pytest_bdd import scenario, given, then
+import helpers
 import httpretty
 import re
-import requests
-import vars
-import helpers
 import time
 
 
@@ -19,7 +16,7 @@ def test_polling_match_tokens():
 
 @given('a list of userid')
 def list_of_userid():
-    return ['1','2']
+    return ['1', '2']
 
 
 @then('it should pull matches for each userid')
@@ -28,9 +25,9 @@ def pull_foreach_userid(list_of_userid):
     expected_urls = map(helpers.match_history_uri, list_of_userid)
 
     httpretty.enable()
-    add_fixtures(list_of_userid, helpers.match_history_uri, lambda _, uri, __: req_urls.append(uri))
+    add_fixtures(lambda _, uri, __: req_urls.append(uri))
 
-    result = Poll().match_tokens(list_of_userid)
+    Poll().match_tokens(list_of_userid)
 
     assert req_urls == expected_urls
     teardown()
@@ -39,7 +36,7 @@ def pull_foreach_userid(list_of_userid):
 @then('it should return the match tokens')
 def return_tokens(list_of_userid):
     httpretty.enable()
-    add_fixtures(list_of_userid, helpers.match_history_uri)
+    add_fixtures()
 
     result = Poll().match_tokens(list_of_userid)
     expected_tokens = [
@@ -81,9 +78,9 @@ def pull_matches(list_of_token):
     expected_url = helpers.multi_match_uri(match_ids_slug)
 
     httpretty.enable()
-    add_fixtures([match_ids_slug], helpers.multi_match_uri, lambda _, uri, __: req_urls.append(uri)) 
+    add_fixtures(lambda _, uri, __: req_urls.append(uri))
 
-    result = Poll().matches(list_of_token)
+    Poll().matches(list_of_token)
     matches_url = req_urls[0]
 
     assert matches_url == expected_url
@@ -92,13 +89,12 @@ def pull_matches(list_of_token):
 
 @then('it should return the match data')
 def return_matches(list_of_token):
-    match_ids_slug = "136200860+136199918"
-
     httpretty.enable()
-    add_fixtures([match_ids_slug], helpers.multi_match_uri) 
+    add_fixtures()
 
     result = Poll().matches(list_of_token)
-    first  = result[0]
+    first = result[0]
+
     assert first['date'] == '2015-04-15'
     teardown()
 
@@ -116,9 +112,9 @@ def poll_player_stats(list_of_userid):
     expected_urls = map(helpers.player_stats_uri, list_of_userid)
 
     httpretty.enable()
-    add_fixtures(list_of_userid, helpers.player_stats_uri, lambda _, uri, __: req_urls.append(uri))
+    add_fixtures(lambda _, uri, __: req_urls.append(uri))
 
-    result = Poll().player_stats(list_of_userid)
+    Poll().player_stats(list_of_userid)
 
     assert req_urls == expected_urls
     teardown()
@@ -126,10 +122,8 @@ def poll_player_stats(list_of_userid):
 
 @then('it should return the player stats')
 def return_player_stats(list_of_userid):
-    expected_urls = map(helpers.player_stats_uri, list_of_userid)
-
     httpretty.enable()
-    add_fixtures(list_of_userid, helpers.player_stats_uri)
+    add_fixtures()
 
     result = Poll().player_stats(list_of_userid)
 
@@ -138,7 +132,7 @@ def return_player_stats(list_of_userid):
     assert result[0]['date'] == today
     assert result[0]['data'] == {
         'nickname': 'Schln',
-        'mmr': '1574.691', 
+        'mmr': '1574.691',
         'games_played': '1843',
         'wins': '914',
         'losses': '929',
@@ -186,11 +180,11 @@ def return_player_stats(list_of_userid):
 
 # --- helpers ---
 
-def add_fixtures(list_of_id, uri_fn, response_cb=None):
-    expected_urls = map(uri_fn, list_of_id)
-
+def add_fixtures(response_cb=None):
     def cb(req, uri, headers):
-        if response_cb != None: response_cb(req, uri, headers)
+        if response_cb is not None:
+            response_cb(req, uri, headers)
+
         body = helpers.fixture_for(uri)
         return (200, headers, body)
 
@@ -198,6 +192,7 @@ def add_fixtures(list_of_id, uri_fn, response_cb=None):
                            re.compile("(.*)"),
                            body=cb,
                            content_type="application/json")
+
 
 def teardown():
     httpretty.disable()
