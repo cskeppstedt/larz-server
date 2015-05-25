@@ -4,6 +4,7 @@ import helpers
 import re
 import requests
 import sys
+import time
 
 
 def log(message):
@@ -134,7 +135,11 @@ class Poll:
         return stats
 
     def to_player_stats_models(self, list_of_stats):
-        return map(to_player_stats, list_of_stats)
+        models = map(to_player_stats, list_of_stats)
+        return {
+            'date': time.strftime("%Y-%m-%d"),
+            'data': {m['nickname']: m for m in models}
+        }
 
     def to_match_models(self, list_of_match, list_of_data):
         lookup = dict(list_of_match)
