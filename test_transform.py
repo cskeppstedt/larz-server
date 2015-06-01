@@ -4,6 +4,7 @@ from transform import to_player
 
 fixture = json.loads(helpers.read_file('./fixtures/transform_to_player.json'))
 
+
 class TestToPlayer:
     def assert_key(self, key, val):
         player = to_player(fixture)
@@ -17,7 +18,7 @@ class TestToPlayer:
             'herokills',
             'level',
             'hero_id',
-            'nickname', 
+            'nickname',
             'heroassists',
             'wards',
             'denies'
@@ -31,7 +32,7 @@ class TestToPlayer:
 
     def test_gpm(self):
         self.assert_key('gpm', '139')
-    
+
     def test_xpm(self):
         self.assert_key('xpm', '152')
 
