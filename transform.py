@@ -1,6 +1,12 @@
 def to_player(multimatch_data):
     d = multimatch_data
 
+    def copy():
+        return lambda key: d[key]
+
+    def rename(fromKey):
+        return lambda key: d[fromKey]
+
     def n(key):
         return int(d[key])
 
@@ -8,48 +14,28 @@ def to_player(multimatch_data):
         return float(d[key])
 
     def rate(key):
-        r = f(key) / f('secs')
-        return str(int(60 * r))
-
-    def apm():
-        return rate('actions')
-
-    def gpm():
-        return rate('gold')
-
-    def xpm():
-        return rate('exp')
-
-    def wards():
-        return d['wards']
+        return lambda _: str(int(60 * f(key) / f('secs')))
 
     def lasthits():
-        return str(n('teamcreepkills') + n('neutralcreepkills'))
+        return lambda _: str(n('teamcreepkills') + n('neutralcreepkills'))
 
-    def mmr_delta():
-        return d['amm_team_rating']
+    mapping = {
+        'apm':         rate('actions'),
+        'deaths':      copy(),
+        'delta_mmr':   rename('amm_team_rating'),
+        'denies':      copy(),
+        'gpm':         rate('gold'),
+        'hero_id':     copy(),
+        'heroassists': copy(),
+        'herokills':   copy(),
+        'lasthits':    lasthits(),
+        'level':       copy(),
+        'nickname':    copy(),
+        'wards':       copy(),
+        'xpm':         rate('exp')
+    }
 
-    keys = [
-        'denies',
-        'deaths',
-        'herokills',
-        'level',
-        'hero_id',
-        'nickname',
-        'heroassists',
-        'wards'
-    ]
-
-    player = {k: d[k] for k in keys}
-
-    player['apm'] = apm()
-    player['gpm'] = gpm()
-    player['xpm'] = xpm()
-    player['lasthits'] = lasthits()
-
-    player['delta_mmr'] = d['amm_team_rating']
-
-    return player
+    return {k: mapping[k](k) for k in mapping.iterkeys()}
 
 
 def to_player_stats(data):
