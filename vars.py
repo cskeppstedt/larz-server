@@ -11,6 +11,5 @@ USERS        = [
     'Pacoloco',
     'Adelsmansman',
     'Schln',
-    'zwex',
-    'khoosan'
+    'zwex'
 ]
