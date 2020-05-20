@@ -2,7 +2,7 @@ backports.ssl-match-hostname==3.4.0.2
 certifi==14.5.14
 enum34==1.0.4
 glob2==0.4.1
-httplib2==0.9
+httplib2==0.18.0
 httpretty==0.8.4
 Mako==1.0.1
 MarkupSafe==0.23
